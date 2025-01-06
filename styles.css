@@ -18,14 +18,15 @@
 }
 
 .hanzi-writer-controls button {
-    padding: 4px 12px;
+    background-color: var(--interactive-normal);
+    color: var(--text-normal);
+    border: 1px solid var(--background-modifier-border);
     border-radius: 4px;
-    background-color: var(--interactive-accent);
-    color: var(--text-on-accent);
-    border: none;
+    padding: 4px 8px;
+    margin: 0 4px;
     cursor: pointer;
 }
 
 .hanzi-writer-controls button:hover {
-    background-color: var(--interactive-accent-hover);
+    background-color: var(--interactive-hover);
 } 
