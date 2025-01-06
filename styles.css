@@ -1,0 +1,31 @@
+.hanzi-writer-container {
+    padding: 1em;
+    background-color: var(--background-secondary);
+    border-radius: 4px;
+    margin: 1em 0;
+}
+
+.hanzi-writer-target {
+    display: inline-block;
+    background-color: var(--background-primary);
+    border-radius: 4px;
+}
+
+.hanzi-writer-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.hanzi-writer-controls button {
+    padding: 4px 12px;
+    border-radius: 4px;
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    cursor: pointer;
+}
+
+.hanzi-writer-controls button:hover {
+    background-color: var(--interactive-accent-hover);
+} 
