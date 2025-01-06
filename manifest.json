@@ -5,5 +5,6 @@
     "minAppVersion": "0.15.0",
     "description": "Interactive Chinese character writing blocks using Hanzi Writer",
     "author": "Nikita Smirnov",
+    "authorUrl": "https://github.com/pakrentos",
     "isDesktopOnly": false
 } 
