@@ -57,7 +57,8 @@ export default class HanziWriterPlugin extends Plugin {
                 strokeAnimationSpeed: config.strokeAnimationSpeed || 1,
                 delayBetweenStrokes: config.delayBetweenStrokes || 1000,
                 strokeColor: config.strokeColor || themeColors.textColor,
-                outlineColor: "#888", // The default outline color (#DDD) is almost identical to the default text color (#dadada)
+                // The default outline color (#DDD) is almost identical to the default text color (#dadada)
+                outlineColor: config.outlineColor || "#888",
                 drawingColor: config.drawingColor || themeColors.textColor,
                 showCharacter: config.showCharacter || false,
                 ...config.options
