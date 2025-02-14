@@ -3,6 +3,7 @@
     background-color: var(--background-secondary);
     border-radius: 4px;
     margin: 1em 0;
+    text-align: center;
 }
 
 .hanzi-writer-target {
@@ -15,6 +16,7 @@
     display: flex;
     gap: 8px;
     justify-content: center;
+    margin-top: 10px;
 }
 
 .hanzi-writer-controls button {

@@ -1,17 +1,23 @@
-import { Plugin, MarkdownPostProcessorContext } from 'obsidian';
+import { Plugin, MarkdownPostProcessorContext, PluginSettingTab, App, Setting } from 'obsidian';
 import HanziWriter from 'hanzi-writer';
 
 export default class HanziWriterPlugin extends Plugin {
+    settings!: HanziWriterPluginSettings;
+
     async onload() {
+        await this.loadSettings();
+
         // Register the hanzi-writer code block processor
         this.registerMarkdownCodeBlockProcessor('hanzi-writer', (source, el, ctx) => {
             this.handleHanziWriter(source, el, ctx);
         });
+
+        this.addSettingTab(new HanziWriterSettingsTab(this.app, this));
     }
 
-    getThemeColors(el: HTMLElement) {
+    getThemeColors() {
         // Get the computed colors from the current theme
-        const computedStyle = getComputedStyle(el);
+        const computedStyle = window.getComputedStyle(document.body);
         const backgroundColor = computedStyle.getPropertyValue('--background-primary');
         const textColor = computedStyle.getPropertyValue('--text-normal');
         
@@ -36,8 +42,7 @@ export default class HanziWriterPlugin extends Plugin {
             }
 
             // Get theme colors
-            const themeColors = this.getThemeColors(el);
-            console.log(themeColors);
+            const themeColors = this.getThemeColors();
 
             // Create target div for HanziWriter
             const target = container.createDiv({ cls: 'hanzi-writer-target' });
@@ -52,15 +57,12 @@ export default class HanziWriterPlugin extends Plugin {
                 strokeAnimationSpeed: config.strokeAnimationSpeed || 1,
                 delayBetweenStrokes: config.delayBetweenStrokes || 1000,
                 strokeColor: config.strokeColor || themeColors.textColor,
-                // outlineColor: config.outlineColor || themeColors.textColor,
+                // The default outline color (#DDD) is almost identical to the default text color (#dadada)
+                outlineColor: config.outlineColor || "#888",
                 drawingColor: config.drawingColor || themeColors.textColor,
-                // highlightColor: config.highlightColor || themeColors.textColor,
                 showCharacter: config.showCharacter || false,
                 ...config.options
             };
-
-            // Set background color on the target element
-            target.style.backgroundColor = themeColors.backgroundColor;
 
             // Initialize HanziWriter
             const writer = HanziWriter.create(target, character, options);
@@ -80,23 +82,61 @@ export default class HanziWriterPlugin extends Plugin {
             quizButton.onclick = () => writer.quiz();
 
             // Debug button
-            const debugButton = buttonContainer.createEl('button', { text: 'Debug' });
-            debugButton.onclick = () => {
-                console.log('Writer instance:', writer);
-                console.log('Config:', config);
-                console.log('Options:', options);
-            };
-
-            // Add some basic styling
-            container.style.textAlign = 'center';
-            buttonContainer.style.marginTop = '10px';
+            if (this.settings.showDebug) {
+                const debugButton = buttonContainer.createEl('button', { text: 'Debug' });
+                debugButton.onclick = () => {
+                    console.log('Writer instance:', writer);
+                    console.log('Config:', config);
+                    console.log('Options:', options);
+                };
+            }
             
         } catch (error) {
             container.setText(`Error: ${error.message}`);
         }
     }
 
-    onunload() {
-        // Cleanup if needed
+    onunload() { }
+
+    async loadSettings() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    }
+
+    async saveSettings() {
+        await this.saveData(this.settings);
     }
 } 
+
+class HanziWriterSettingsTab extends PluginSettingTab {
+    plugin: HanziWriterPlugin;
+
+    constructor(app: App, plugin: HanziWriterPlugin) {
+        super(app, plugin);
+        this.plugin = plugin;
+    }
+
+    display(): void {
+        const { containerEl } = this;
+
+        containerEl.empty();
+
+        new Setting(containerEl)
+            .setName("Show debug button")
+            .setDesc("Shows the debug button that will print debug information to the console.")
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.showDebug)
+                .onChange(async (value) => {
+                    this.plugin.settings.showDebug = value;
+                    await this.plugin.saveSettings();
+                })
+            );
+    }
+}
+
+interface HanziWriterPluginSettings {
+    showDebug: boolean;
+}
+
+const DEFAULT_SETTINGS: HanziWriterPluginSettings = {
+    showDebug: false
+}
