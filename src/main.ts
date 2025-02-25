@@ -46,6 +46,10 @@ export default class HanziWriterPlugin extends Plugin {
 
             // Create target div for HanziWriter
             const target = container.createDiv({ cls: 'hanzi-writer-target' });
+
+            if (config.quizOnStart !== false) {
+                target.addClass("hanzi-writer-quiz");
+            }
             
             // Set up default options with theme colors
             const options = {
@@ -75,11 +79,17 @@ export default class HanziWriterPlugin extends Plugin {
             
             // Animate button
             const animateButton = buttonContainer.createEl('button', { text: 'Animate' });
-            animateButton.onclick = () => writer.animateCharacter();
+            animateButton.onclick = () => {
+                target.removeClass("hanzi-writer-quiz");
+                writer.animateCharacter();
+            }
 
             // Quiz button
             const quizButton = buttonContainer.createEl('button', { text: 'Quiz' });
-            quizButton.onclick = () => writer.quiz();
+            quizButton.onclick = () => {
+                target.addClass("hanzi-writer-quiz");
+                writer.quiz();
+            }
 
             // Debug button
             if (this.settings.showDebug) {
