@@ -4,12 +4,17 @@
     border-radius: 4px;
     margin: 1em 0;
     text-align: center;
+    cursor: default;
 }
 
 .hanzi-writer-target {
     display: inline-block;
     background-color: var(--background-primary);
     border-radius: 4px;
+}
+
+.hanzi-writer-quiz {
+    cursor: crosshair;
 }
 
 .hanzi-writer-controls {
