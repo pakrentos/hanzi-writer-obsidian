@@ -46,6 +46,10 @@ export default class HanziWriterPlugin extends Plugin {
 
             // Create target div for HanziWriter
             const target = container.createDiv({ cls: 'hanzi-writer-target' });
+
+            if (config.quizOnStart !== false) {
+                target.addClass("hanzi-writer-quiz");
+            }
             
             // Set up default options with theme colors
             const options = {
