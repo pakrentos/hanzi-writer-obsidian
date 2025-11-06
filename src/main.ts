@@ -28,31 +28,35 @@ export default class HanziWriterPlugin extends Plugin {
     }
 
     handleHanziWriter(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) {
-        // Create container for the character
-        const container = el.createDiv({ cls: 'hanzi-writer-container' });
-        
         try {
             // Parse the source content
             const config = JSON.parse(source);
-            const character = config.character;
             
-            if (!character) {
-                container.setText('Error: No character specified');
+            // Determine characters to render
+            let characters: string[] = [];
+            if (config.characters && Array.isArray(config.characters)) {
+                // Use explicit characters array
+                characters = config.characters;
+            } else if (config.character) {
+                // Split character string into individual characters
+                characters = Array.from(config.character);
+            } else {
+                const errorContainer = el.createDiv({ cls: 'hanzi-writer-container' });
+                errorContainer.setText('Error: No character(s) specified');
                 return;
             }
 
             // Get theme colors
             const themeColors = this.getThemeColors();
 
-            // Create target div for HanziWriter
-            const target = container.createDiv({ cls: 'hanzi-writer-target' });
+            // Store quizOnStart preference
+            const quizOnStart = config.quizOnStart !== undefined ? config.quizOnStart : true;
             
             // Set up default options with theme colors
-            const options = {
+            const baseOptions = {
                 width: config.width || 100,
                 height: config.height || 100,
                 padding: config.padding || 5,
-                quizOnStart: config.quizOnStart || true,
                 showOutline: config.showOutline !== undefined ? config.showOutline : false,
                 strokeAnimationSpeed: config.strokeAnimationSpeed || 1,
                 delayBetweenStrokes: config.delayBetweenStrokes || 1000,
@@ -64,35 +68,63 @@ export default class HanziWriterPlugin extends Plugin {
                 ...config.options
             };
 
-            // Initialize HanziWriter
-            const writer = HanziWriter.create(target, character, options);
-            if (options.quizOnStart) {
-                writer.quiz();
-            }
-    
-            // Add control buttons
-            const buttonContainer = container.createDiv({ cls: 'hanzi-writer-controls' });
-            
-            // Animate button
-            const animateButton = buttonContainer.createEl('button', { text: 'Animate' });
-            animateButton.onclick = () => writer.animateCharacter();
+            // Create a HanziWriter instance for each character
+            characters.forEach((character) => {
+                // Create container for this character
+                const container = el.createDiv({ cls: 'hanzi-writer-container' });
+                
+                // Create target div for HanziWriter
+                const target = container.createDiv({ cls: 'hanzi-writer-target' });
+                
+                // Initialize HanziWriter with load callbacks
+                let writer: any;
+                try {
+                    const writerOptions = {
+                        ...baseOptions,
+                        onLoadCharDataSuccess: () => {
+                            if (quizOnStart) {
+                                writer.quiz();
+                            }
+                        },
+                        onLoadCharDataError: (err: any) => {
+                            console.error('Failed to load character data for:', character, err);
+                            target.setText(`Failed to load: ${character}`);
+                        }
+                    };
+                    
+                    writer = HanziWriter.create(target, character, writerOptions);
+                } catch (error) {
+                    console.error('Failed to create HanziWriter for character:', character, error);
+                    target.setText(`Failed to load character: ${character}`);
+                    return;
+                }
+        
+                // Add control buttons
+                const buttonContainer = container.createDiv({ cls: 'hanzi-writer-controls' });
+                
+                // Animate button
+                const animateButton = buttonContainer.createEl('button', { text: 'Animate' });
+                animateButton.onclick = () => writer.animateCharacter();
 
-            // Quiz button
-            const quizButton = buttonContainer.createEl('button', { text: 'Quiz' });
-            quizButton.onclick = () => writer.quiz();
+                // Quiz button
+                const quizButton = buttonContainer.createEl('button', { text: 'Quiz' });
+                quizButton.onclick = () => writer.quiz();
 
-            // Debug button
-            if (this.settings.showDebug) {
-                const debugButton = buttonContainer.createEl('button', { text: 'Debug' });
-                debugButton.onclick = () => {
-                    console.log('Writer instance:', writer);
-                    console.log('Config:', config);
-                    console.log('Options:', options);
-                };
-            }
+                // Debug button
+                if (this.settings.showDebug) {
+                    const debugButton = buttonContainer.createEl('button', { text: 'Debug' });
+                    debugButton.onclick = () => {
+                        console.log('Character:', character);
+                        console.log('Writer instance:', writer);
+                        console.log('Config:', config);
+                        console.log('Options:', baseOptions);
+                    };
+                }
+            });
             
         } catch (error) {
-            container.setText(`Error: ${error.message}`);
+            const errorContainer = el.createDiv({ cls: 'hanzi-writer-container' });
+            errorContainer.setText(`Error: ${error.message}`);
         }
     }
 

@@ -1,7 +1,7 @@
 {
     "id": "hanzi-writer",
     "name": "Hanzi Writer",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "minAppVersion": "0.15.0",
     "description": "Interactive Chinese character writing blocks using Hanzi Writer",
     "author": "Nikita Smirnov",
