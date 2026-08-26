@@ -32,3 +32,7 @@
 .hanzi-writer-controls button:hover {
     background-color: var(--interactive-hover);
 } 
+.hanzi-writer-container.hanzi-writer-transparent,
+.hanzi-writer-container.hanzi-writer-transparent .hanzi-writer-target {
+    background-color: transparent;
+}

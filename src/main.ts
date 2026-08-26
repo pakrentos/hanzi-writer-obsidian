@@ -49,8 +49,15 @@ export default class HanziWriterPlugin extends Plugin {
             // Get theme colors
             const themeColors = this.getThemeColors();
 
-            // Store quizOnStart preference
-            const quizOnStart = config.quizOnStart !== undefined ? config.quizOnStart : true;
+            // Store startup behaviour preferences
+            const animateOnStart = config.animateOnStart === true;
+            const loopAnimation = config.loopAnimation === true;
+            // Animation on start takes precedence over the (default-on) quiz
+            const quizOnStart = config.quizOnStart !== undefined
+                ? config.quizOnStart
+                : !(animateOnStart || loopAnimation);
+            const transparentBackground = config.transparentBackground === true;
+            const showButtons = config.showButtons !== undefined ? config.showButtons : true;
             
             // Set up default options with theme colors
             const baseOptions = {
@@ -60,6 +67,7 @@ export default class HanziWriterPlugin extends Plugin {
                 showOutline: config.showOutline !== undefined ? config.showOutline : false,
                 strokeAnimationSpeed: config.strokeAnimationSpeed || 1,
                 delayBetweenStrokes: config.delayBetweenStrokes || 1000,
+                delayBetweenLoops: config.delayBetweenLoops !== undefined ? config.delayBetweenLoops : 2000,
                 strokeColor: config.strokeColor || themeColors.textColor,
                 // The default outline color (#DDD) is almost identical to the default text color (#dadada)
                 outlineColor: config.outlineColor || "#888",
@@ -72,6 +80,9 @@ export default class HanziWriterPlugin extends Plugin {
             characters.forEach((character) => {
                 // Create container for this character
                 const container = el.createDiv({ cls: 'hanzi-writer-container' });
+                if (transparentBackground) {
+                    container.addClass('hanzi-writer-transparent');
+                }
                 
                 // Create target div for HanziWriter
                 const target = container.createDiv({ cls: 'hanzi-writer-target' });
@@ -82,7 +93,11 @@ export default class HanziWriterPlugin extends Plugin {
                     const writerOptions = {
                         ...baseOptions,
                         onLoadCharDataSuccess: () => {
-                            if (quizOnStart) {
+                            if (loopAnimation) {
+                                writer.loopCharacterAnimation();
+                            } else if (animateOnStart) {
+                                writer.animateCharacter();
+                            } else if (quizOnStart) {
                                 writer.quiz();
                             }
                         },
@@ -100,11 +115,17 @@ export default class HanziWriterPlugin extends Plugin {
                 }
         
                 // Add control buttons
+                if (!showButtons) {
+                    return;
+                }
+
                 const buttonContainer = container.createDiv({ cls: 'hanzi-writer-controls' });
                 
                 // Animate button
                 const animateButton = buttonContainer.createEl('button', { text: 'Animate' });
-                animateButton.onclick = () => writer.animateCharacter();
+                animateButton.onclick = () => loopAnimation
+                    ? writer.loopCharacterAnimation()
+                    : writer.animateCharacter();
 
                 // Quiz button
                 const quizButton = buttonContainer.createEl('button', { text: 'Quiz' });
