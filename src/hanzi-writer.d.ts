@@ -6,12 +6,16 @@ declare module 'hanzi-writer' {
         showOutline?: boolean;
         strokeAnimationSpeed?: number;
         delayBetweenStrokes?: number;
+        delayBetweenLoops?: number;
         strokeColor?: string;
         [key: string]: any;
     }
 
     interface HanziWriter {
         animateCharacter(): void;
+        loopCharacterAnimation(): void;
+        pauseAnimation(): void;
+        resumeAnimation(): void;
         quiz(): void;
     }
 

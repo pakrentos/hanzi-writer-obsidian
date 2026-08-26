@@ -37,10 +37,15 @@ Create a code block with the language `hanzi-writer` and provide a JSON configur
 - `width`: Width of the character box in pixels (default: 100)
 - `height`: Height of the character box in pixels (default: 100)
 - `padding`: Padding around the character (default: 5)
-- `quizOnStart`: Start in quiz mode immediately (default: true)
+- `quizOnStart`: Start in quiz mode immediately (default: true, unless `animateOnStart` or `loopAnimation` is enabled)
 - `showOutline`: Show character outline (default: false)
 - `strokeAnimationSpeed`: Speed of stroke animations (default: 1)
 - `delayBetweenStrokes`: Delay between strokes in milliseconds (default: 1000)
+- `delayBetweenLoops`: Delay between animation loops in milliseconds (default: 2000)
+- `animateOnStart`: Play the stroke animation once as soon as the character loads (default: false)
+- `loopAnimation`: Loop the stroke animation endlessly, starting on load (default: false)
+- `transparentBackground`: Render the block with no background, so it blends into the note (default: false)
+- `showButtons`: Show the control buttons below the character; set to `false` to hide them (default: true)
 - `strokeColor`: Color of character strokes (defaults to theme text color)
 - `drawingColor`: Color of user drawing (defaults to theme text color)
 
@@ -48,8 +53,8 @@ and all other options from [Hanzi Writer](https://hanziwriter.org/docs/api/optio
 
 ## Controls
 
-Each character block includes three buttons:
-- **Animate**: Shows stroke order animation
+Each character block includes three buttons (hidden when `showButtons` is `false`):
+- **Animate**: Shows stroke order animation (loops when `loopAnimation` is enabled)
 - **Quiz**: Starts writing practice mode
 - **Debug**: Shows debug information in console
 
